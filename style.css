@@ -6,12 +6,24 @@
 h1 { color: #ffffff;}
 h2 { color:white}
 h3 { color: #aabbfd;}
-p, li, a {color: white}
+p li a {color: white}
 
 
 body {
-    background-color: #000000;}
+    background-color: #000000;
+    text-align: center;
+}
+
 
 .container {
     display: flex;
 } 
+ 
+
+
+nav ul li {
+    display: inline;
+    text-align: center;
+    margin: 30px 10px 30px 10px; /*top right bottom left*/
+    
+}
