@@ -3,7 +3,14 @@
     margin: 10;
 }
 
-h1 { color: #ffffff;}
+h1 { color: #ffffff;
+   padding: 10px;
+   margin: 10px;
+   line-height: 2;
+   font-family: 'Times New Roman', Times, serif;}
+
+
+
 h2 { color:white}
 h3 { color: #aabbfd;}
 p li a {color: white}
