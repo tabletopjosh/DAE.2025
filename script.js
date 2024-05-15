@@ -12,7 +12,7 @@ let userAge = 25;
 let isStudent = true;
 let numberOfCourses = 4;
 
-// Implement Mathematical Operations
+// Implement Mathematical Operation s
 let sum = numberOfCourses + 1;
 
 // Create decision making with decision structures
