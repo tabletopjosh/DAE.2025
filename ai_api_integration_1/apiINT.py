@@ -1,39 +1,55 @@
 import requests
-from flask import Flask, render_template, request
 
-# FLASK APPLICATION SETUP
-app = Flask(__name__)
+def get_weather(city, api_key):
+    """Fetch weather data for a city using OpenWeatherMap API."""
+    weather_url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
+    response = requests.get(weather_url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return {"error": "Failed to fetch weather data", "status_code": response.status_code}
 
-# API KEYS AND BASE URLS
-WEATHER_API_KEY = "your_openweathermap_api_key"  # REPLACE WITH YOUR WEATHER API KEY
-MAPS_API_KEY = "your_google_maps_api_key"  # REPLACE WITH YOUR GOOGLE MAPS API KEY
-WEATHER_API_URL = "https://api.openweathermap.org/data/2.5/weather"
-MAPS_API_URL = "https://maps.googleapis.com/maps/api/staticmap"
+def get_news(api_key):
+    """Fetch top headlines using News API."""
+    news_url = f"https://newsapi.org/v2/top-headlines?country=us&apiKey={api_key}"
+    response = requests.get(news_url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return {"error": "Failed to fetch news data", "status_code": response.status_code}
 
-# ROUTE FOR HOME PAGE
-@app.route('/', methods=['GET', 'POST'])
-def home():
-    weather_data = None
-    map_url = None
+def format_weather_data(weather_data):
+    """Format weather data for display."""
+    if "error" in weather_data:
+        return weather_data["error"]
 
-    if request.method == 'POST':
-        city = request.form.get('city')
+    city = weather_data["name"]
+    temp = weather_data["main"]["temp"]
+    description = weather_data["weather"][0]["description"]
+    return f"Weather in {city}: {temp}°C, {description.capitalize()}"
 
-        # RESTFUL API METHOD UTILIZATION - GET REQUEST TO WEATHER API
-        weather_response = requests.get(WEATHER_API_URL, params={
-            'q': city,
-            'appid': WEATHER_API_KEY,
-            'units': 'metric'
-        })
+def format_news_data(news_data):
+    """Format news headlines for display."""
+    if "error" in news_data:
+        return news_data["error"]
 
-        if weather_response.status_code == 200:
-            # STRUCTURING API REQUESTS AND RESPONSES - PARSE WEATHER RESPONSE
-            weather_data = weather_response.json()
+    articles = news_data.get("articles", [])
+    formatted_news = "\n".join([f"- {article['title']}" for article in articles[:5]])
+    return f"Top News Headlines:\n{formatted_news}"
 
-            # FORMAT AND DISPLAY API DATA
-            map_url = f"{MAPS_API_URL}?center={city}&zoom=12&size=600x300&key={MAPS_API_KEY}"  # MAP URL FORMATTING
+def main():
+    # API keys
+    weather_api_key = "5e8fb2c80fe69508b23b1a4596ac4816"
+    news_api_key = "6a5df9f4d9ba47ddaf704b9e714045bc"
 
-    return render_template('index.html', weather=weather_data, map_url=map_url)
+    # Fetch and display weather data
+    city = input("Enter a city for weather information: ")
+    weather_data = get_weather(city, weather_api_key)
+    print(format_weather_data(weather_data))
 
-if __name__ == '__main__':
-    app.run(debug=True)
+    # Fetch and display news data
+    news_data = get_news(news_api_key)
+    print(format_news_data(news_data))
+
+if __name__ == "__main__":
+    main()
