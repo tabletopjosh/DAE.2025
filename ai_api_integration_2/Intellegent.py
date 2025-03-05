@@ -2,29 +2,32 @@ import requests
 import os
 from dotenv import load_dotenv
 
-def get_coordinates(address, google_maps_api_key):
+# Load environment variables
+load_dotenv()
+
+def get_coordinates(address):
     """Fetches latitude and longitude from Google Maps Geocoding API."""
     try:
-        # API Integration: Using Google Maps API to get coordinates
+        google_maps_api_key = os.getenv("GOOGLE_MAPS_API_KEY")  # Secure API key retrieval
         url = f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={google_maps_api_key}"
         response = requests.get(url)
-        response.raise_for_status()  # Error Handling: Raise exception for HTTP errors
+        response.raise_for_status()
         data = response.json()
-        
+
         if data["status"] == "OK":
             location = data["results"][0]["geometry"]["location"]
             return location["lat"], location["lng"]
         else:
             raise ValueError(f"Error from Google API: {data['status']}")
     except requests.exceptions.RequestException as e:
-        return f"API Request Error: {e}"  # Error Handling: Network or API failure
+        return f"API Request Error: {e}"
     except ValueError as ve:
-        return f"Data Error: {ve}"  # Error Handling: Invalid response format
+        return f"Data Error: {ve}"
 
-def get_weather(lat, lon, openweather_api_key):
+def get_weather(lat, lon):
     """Fetches weather data using OpenWeather API based on coordinates."""
     try:
-        # API Integration: Using OpenWeather API to fetch weather details
+        openweather_api_key = os.getenv("OPENWEATHER_API_KEY")  # Secure API key retrieval
         url = f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={openweather_api_key}&units=metric"
         response = requests.get(url)
         response.raise_for_status()
@@ -35,32 +38,26 @@ def get_weather(lat, lon, openweather_api_key):
             "city": data["name"]
         }
     except requests.exceptions.RequestException as e:
-        return f"API Request Error: {e}"  # Error Handling: Network or API failure
+        return f"API Request Error: {e}"
 
 def main():
-    # Security: Avoid hardcoding API keys in production (Use environment variables instead)
-    GOOGLE_MAPS_API_KEY = "YOUR_GOOGLE_MAPS_API_KEY"
-    OPENWEATHER_API_KEY = "93fbb97f6679e811afedf68dd755b7e1"  # Replace with environment variable in production
-    
-    # User input for location
     address = input("Enter a location: ")
     
-    # Integrating Multiple APIs: Fetch coordinates from Google Maps API
-    coordinates = get_coordinates(address, GOOGLE_MAPS_API_KEY)
+    # Fetch coordinates from Google Maps API
+    coordinates = get_coordinates(address)
     if isinstance(coordinates, str):
-        print(coordinates)  # Error Handling: Print error message if API call fails
+        print(coordinates)
         return
     
     lat, lon = coordinates
     
-    # Integrating Multiple APIs: Fetch weather data using OpenWeather API
-    weather_data = get_weather(lat, lon, OPENWEATHER_API_KEY)
+    # Fetch weather data using OpenWeather API
+    weather_data = get_weather(lat, lon)
     if isinstance(weather_data, str):
-        print(weather_data)  # Error Handling: Print error message if API call fails
+        print(weather_data)
         return
     
-    # Output results to the user
     print(f"Weather in {weather_data['city']}: {weather_data['weather']}, {weather_data['temperature']}°C")
-    
+
 if __name__ == "__main__":
-    main()  # Testing & Troubleshooting: Runs the program to validate API responses
+    main()
