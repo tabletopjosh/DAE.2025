@@ -41,29 +41,33 @@ def main():
     # Security: Load API keys from environment variables
     load_dotenv()  # Load environment variables from .env file
     
-    # Get API keys from environment variables with fallback to hardcoded values for testing only
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "AIzaSyAvLnnTWlNLfzpi64lqy5oq9Up0od-FTHw")
+    # Get API keys from environment variables
+    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")  # No default fallback to itself
     OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "93fbb97f6679e811afedf68dd755b7e1")
+    
+    if not GEMINI_API_KEY:
+        print("Error: GEMINI_API_KEY is not set.")
+        return
     
     # User input for location
     address = input("Enter a location: ")
     
-    # Integrating Multiple APIs: Fetch coordinates from Gemini API
+    # Fetch coordinates from Gemini API
     coordinates = get_coordinates(address, GEMINI_API_KEY)
     if isinstance(coordinates, str):
-        print(coordinates)  # Error Handling: Print error message if API call fails
+        print(coordinates)  # Print error message if API call fails
         return
     
     lat, lon = coordinates
     
-    # Integrating Multiple APIs: Fetch weather data using OpenWeather API
+    # Fetch weather data using OpenWeather API
     weather_data = get_weather(lat, lon, OPENWEATHER_API_KEY)
     if isinstance(weather_data, str):
-        print(weather_data)  # Error Handling: Print error message if API call fails
+        print(weather_data)  # Print error message if API call fails
         return
     
     # Output results to the user
     print(f"Weather in {weather_data['city']}: {weather_data['weather']}, {weather_data['temperature']}°C")
-    
+
 if __name__ == "__main__":
     main()  # Testing & Troubleshooting: Runs the program to validate API responses
